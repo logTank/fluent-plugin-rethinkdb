@@ -27,6 +27,7 @@ module Fluent
       @host  = conf['host']
       @port  = conf['port']
       @table = conf['table']
+      @auto_tag_table = conf['auto_tag_table']
     end
 
     def start
