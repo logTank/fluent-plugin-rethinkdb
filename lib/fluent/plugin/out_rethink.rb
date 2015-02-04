@@ -12,10 +12,10 @@ module Fluent
     config_param :auto_tag_table, :default => false
 
     include SetTagKeyMixin
-    config_set_default :include_tag_key, true
+    config_set_default :include_tag_key, false
 
     include SetTimeKeyMixin
-    config_set_default :include_time_key, true
+    config_set_default :include_time_key, false
 
     # This method is called before starting.
     # 'conf' is a Hash that includes configuration parameters.
@@ -59,27 +59,36 @@ module Fluent
         record[@time_key] = Time.at(time || record[@time_key]) if @include_time_key
         record[@tag_key] = tag if @include_tag_key
         records[tag] ||= []
-        records[tag] << record
+        records[tag] << JSON.parse(record)
       }
 
       begin
         records.map do |tag, elements|
           if !elements.empty?
-            get_table(@auto_tag_table ? tag : @table).insert(elements).run(@conn)
+            output = get_table(@auto_tag_table ? tag : @table).insert(elements).run(
+              @conn
+            )
           end
         end
       rescue
       end
-    end  
+    end
 
-    def get_table(table)
-      return r.table(table) unless @auto_tag_table
-
-      begin 
-        r.table_create(table).run @conn
-        r.table(table)
+    def get_table(table_name)
+      return r.table(table_name) unless @auto_tag_table
+      table = nil
+      begin
+        r.table_create(table_name).run @conn
+        table = r.table(table_name)
       rescue RethinkDB::RqlRuntimeError =>e
+        table = r.table(table_name)
+      ensure
+        if table.nil?
+          puts "Sucks! Table still nill"
+        end
       end
+
+      return table
     end
 
   end
