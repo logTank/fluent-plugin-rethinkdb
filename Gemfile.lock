@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    fluent-plugin-logtank-rethinkdb (0.1.0)
+    fluent-plugin-logtank-rethinkdb (0.1.1)
       fluentd
       rethinkdb (>= 2.0.0)
 

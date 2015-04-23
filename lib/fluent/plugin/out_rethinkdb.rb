@@ -59,7 +59,7 @@ module Fluent
         record[@time_key] = Time.at(time || record[@time_key]) if @include_time_key
         record[@tag_key] = tag if @include_tag_key
         records[tag] ||= []
-        records[tag] << JSON.parse(record)
+        records[tag] << record
       }
 
       begin
