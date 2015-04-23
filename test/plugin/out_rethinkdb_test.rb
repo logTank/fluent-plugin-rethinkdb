@@ -7,7 +7,7 @@ class RethinkOutputTest < Test::Unit::TestCase
 
   def setup
     Fluent::Test.setup
-    require 'fluent/plugin/out_rethink'
+    require 'fluent/plugin/out_rethinkdb'
     setup_rethinkdb
   end
 
@@ -23,7 +23,7 @@ class RethinkOutputTest < Test::Unit::TestCase
 
   def base_config
     %[
-      type rethink
+      type rethinkdb
       database #{RETHINK_DB}
       table #{table_name}
       port #{unused_port}
@@ -134,7 +134,7 @@ class RethinkOutputTest < Test::Unit::TestCase
   end
 
   def test_format_no_time_no_tag
-    d = create_driver(base_config + 
+    d = create_driver(base_config +
                       %[
           include_tag_key false
           include_time_key false
@@ -148,7 +148,7 @@ class RethinkOutputTest < Test::Unit::TestCase
     d.run
     assert_equal(2, r.table(table_name).count().run(@@conn))
   end
-  
+
   def test_auto_tag_table
     d = Fluent::Test::BufferedOutputTestDriver.new(Fluent::RethinkOutput, "system").configure(default_config + %[
       auto_tag_table true

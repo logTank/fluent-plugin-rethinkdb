@@ -10,3 +10,4 @@ task :step do
   puts "Step 1"
 end
 
+task :default => [:test]
