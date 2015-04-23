@@ -29,19 +29,19 @@ module RethinkTestHelper
 
   def setup_rethinkdb
     unless defined?(@@current_rethinkdb_test_class) and @@current_rethinkdb_test_class == self.class
-      cleanup_rethinkdbd_env           
+      cleanup_rethinkdbd_env
       @@current_rethinkdb_test_class = self.class
       @@rethinkdb_port = unused_port
       dirname = RETHINK_PATH# File.basename(Dir.getwd)
       @@pid = spawn("cd #{dirname} && rethinkdb --bind all --driver-port #{@@rethinkdb_port}")
       sleep 3
-      
+
       @@conn = r.connect(:host => '127.0.0.1',
                           :port => @@rethinkdb_port,
                           :db => RETHINK_DB
                           )
       r.db_create(RETHINK_DB).run(@@conn) rescue nil
-      
+
     end
 
     @@setup_count += 1;
@@ -50,12 +50,12 @@ module RethinkTestHelper
   def teardown_rethinkdb
     return
     if defined?(@@current_rethinkdb_test_class)
-      begin 
+      begin
         #r.db_drop(RETHINK_DB).run(@@conn)
         #@@conn.close
       rescue
         puts "Cannot close rethinkdb"
-      end 
+      end
     end
     if @@setup_count == self.class.methods.size
       #cleanup_rethinkdbd_env

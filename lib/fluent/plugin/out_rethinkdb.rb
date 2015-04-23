@@ -3,7 +3,7 @@ require 'rethinkdb'
 module Fluent
   class RethinkOutput < BufferedOutput
     include RethinkDB::Shortcuts
-    Plugin.register_output('rethink', self)
+    Plugin.register_output('rethinkdb', self)
 
     config_param :database, :string
     config_param :host, :string, :default => 'localhost'
@@ -64,13 +64,11 @@ module Fluent
 
       begin
         records.map do |tag, elements|
-          if !elements.empty?
-            output = get_table(@auto_tag_table ? tag : @table).insert(elements).run(
-              @conn
-            )
-          end
+          get_table(@auto_tag_table ? tag : @table).insert(elements).run(@conn) if !elements.empty?
         end
       rescue
+        log.error "unexpected error when inserting elements", :error=>$!.to_s
+        log.error_backtrace
       end
     end
 
