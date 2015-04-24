@@ -10,6 +10,7 @@ module Fluent
     config_param :table, :string, :default => :log
     config_param :port, :integer, :default => 28015
     config_param :auto_tag_table, :default => false
+    config_param :search_replace_subtag, :string, :default => nil
 
     include SetTagKeyMixin
     config_set_default :include_tag_key, false
@@ -28,6 +29,8 @@ module Fluent
       @port  = conf['port']
       @table = conf['table']
       @auto_tag_table = conf['auto_tag_table']
+      @search_replace_subtag = conf['search_replace_subtag']
+      @search_subtag, @replace_subtag = @search_replace_subtag.split('/') if !@search_replace_subtag.nil?
     end
 
     def start
@@ -89,6 +92,12 @@ module Fluent
       return table
     end
 
+    def get_tag(tag)
+      return tag if @search_replace_subtag.nil?
+
+      tag[@search_subtag] = @replace_subtag
+      return tag
+    end
   end
 end
 
