@@ -30,7 +30,7 @@ module Fluent
       @table = conf['table']
       @auto_tag_table = conf['auto_tag_table']
       @search_replace_subtag = conf['search_replace_subtag']
-      @search_subtag, @replace_subtag = @search_replace_subtag.split('/') if !@search_replace_subtag.nil?
+      @search_subtag, @replace_subtag = @search_replace_subtag.split('/') if @search_replace_subtag
     end
 
     def start
@@ -60,7 +60,7 @@ module Fluent
       records = {}
       chunk.msgpack_each {|(tag,time,record)|
         record[@time_key] = Time.at(time || record[@time_key]) if @include_time_key
-        record[@tag_key] = tag if @include_tag_key
+        record[@tag_key] = get_tag(tag) if @include_tag_key
         records[tag] ||= []
         records[tag] << record
       }
